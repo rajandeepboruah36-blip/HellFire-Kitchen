@@ -1,4 +1,4 @@
-use client";
+"use client";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -100,3 +100,8 @@ Address: ${form.address}`;
           >
             {loading ? "Placing Order..." : "Place Order"}
           </button>
+        </div>
+      )}
+    </div>
+  );
+}

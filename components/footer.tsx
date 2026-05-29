@@ -33,6 +33,9 @@ export function Footer() {
             <Link href="/auth" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Login
             </Link>
+            <Link href="/admin" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+              Admin
+            </Link>
           </div>
 
           {/* Divider */}

@@ -53,7 +53,7 @@ export default function HomePage() {
             Hot Food. Bold Flavor.
           </p>
 
-          <Link href="/checkout">
+          <Link href="/menu">
             <Button 
               size="lg" 
               className="text-lg px-10 py-7 font-bold group shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all"

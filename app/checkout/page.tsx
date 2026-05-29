@@ -1,4 +1,4 @@
-"use client";
+use client";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -52,22 +52,21 @@ Address: ${form.address}`;
     <div className="min-h-screen bg-black text-white p-6">
       <h1 className="text-2xl font-bold text-orange-500 mb-6">Checkout</h1>
       {success ? (
-      <div className="text-center space-y-4">
-  <h2 className="text-xl text-green-500">Order Placed! ✅</h2>
-  <p className="text-gray-400 mt-2">We will contact you shortly!</p>
-  <a
-    href="/track"
-    className="block w-full p-4 bg-orange-500 rounded-lg font-bold text-lg text-white text-center"
-  >
-    Track Your Order 📦
-  </a>
-  <a
-    href="/"
-    className="block text-gray-400 hover:text-white"
-  >
-    ← Back to Home
-  </a>
-</div>
+        <div className="text-center space-y-4">
+          <h2 className="text-xl text-green-500">Order Placed! ✅</h2>
+          <p className="text-gray-400 mt-2">We will contact you shortly!</p>
+          <a
+            href="/track"
+            className="block w-full p-4 bg-orange-500 rounded-lg font-bold text-lg text-white text-center mt-4"
+          >
+            Track Your Order 📦
+          </a>
+          <a
+            href="/"
+            className="block text-gray-400 hover:text-white mt-2"
+          >
+            ← Back to Home
+          </a>
         </div>
       ) : (
         <div className="space-y-4">
@@ -101,9 +100,3 @@ Address: ${form.address}`;
           >
             {loading ? "Placing Order..." : "Place Order"}
           </button>
-        </div>
-      )}
-    </div>
-  );
-}
-  

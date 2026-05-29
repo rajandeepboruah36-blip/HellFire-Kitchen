@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import {
-  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle,
+  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ interface Order {
   address: string;
   items: string;
   price: number;
-  status: "Pending" | "Preparing" | "Delivered";
+  status: "Pending" | "Preparing" | "Delivered" | "Cancelled";
   created_at: string;
 }
 
@@ -29,6 +29,7 @@ function StatusBadge({ status }: { status: Order["status"] }) {
     Pending: { bg: "bg-yellow-500/10", text: "text-yellow-500", icon: Clock },
     Preparing: { bg: "bg-blue-500/10", text: "text-blue-500", icon: ChefHat },
     Delivered: { bg: "bg-green-500/10", text: "text-green-500", icon: CheckCircle },
+    Cancelled: { bg: "bg-red-500/10", text: "text-red-500", icon: XCircle },
   };
   const config = statusConfig[status];
   const Icon = config.icon;
@@ -68,10 +69,18 @@ export function AdminDashboard() {
     fetchOrders();
   };
 
+  const cancelOrder = async (orderId: string) => {
+    if (confirm("Are you sure you want to cancel this order?")) {
+      await supabase.from("orders").update({ status: "Cancelled" }).eq("id", orderId);
+      fetchOrders();
+    }
+  };
+
   const stats = {
     pending: orders.filter((o) => o.status === "Pending").length,
     preparing: orders.filter((o) => o.status === "Preparing").length,
     delivered: orders.filter((o) => o.status === "Delivered").length,
+    cancelled: orders.filter((o) => o.status === "Cancelled").length,
     total: orders.reduce((acc, o) => acc + (o.price || 0), 0),
   };
 
@@ -113,15 +122,26 @@ export function AdminDashboard() {
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-orange-500 font-bold">₹{order.price}</p>
-                <select
-                  value={order.status}
-                  onChange={(e) => updateOrderStatus(order.id, e.target.value as Order["status"])}
-                  className="bg-background border border-border rounded-md px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Preparing">Preparing</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateOrderStatus(order.id, e.target.value as Order["status"])}
+                    className="bg-background border border-border rounded-md px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Preparing">Preparing</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                  {order.status !== "Cancelled" && order.status !== "Delivered" && (
+                    <button
+                      onClick={() => cancelOrder(order.id)}
+                      className="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 {new Date(order.created_at).toLocaleString()}
@@ -192,7 +212,7 @@ export function AdminDashboard() {
           {/* DASHBOARD TAB */}
           {activeTab === "Dashboard" && (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Pending</p>
                   <p className="text-2xl font-bold text-yellow-500">{stats.pending}</p>
@@ -204,6 +224,10 @@ export function AdminDashboard() {
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Delivered</p>
                   <p className="text-2xl font-bold text-green-500">{stats.delivered}</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Cancelled</p>
+                  <p className="text-2xl font-bold text-red-500">{stats.cancelled}</p>
                 </div>
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Total Revenue</p>

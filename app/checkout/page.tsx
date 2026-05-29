@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    address: "",
-  });
+  const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -18,6 +20,16 @@ export default function CheckoutPage() {
       return;
     }
     setLoading(true);
+
+    await supabase.from("orders").insert([
+      {
+        customer_name: form.name,
+        phone: form.phone,
+        address: form.address,
+        status: "Pending",
+      },
+    ]);
+
     const whatsappMessage = `New Order from Hell Fire Kitchen!
 Name: ${form.name}
 Phone: ${form.phone}
@@ -68,3 +80,5 @@ Address: ${form.address}`;
     </div>
   );
 }
+
+      

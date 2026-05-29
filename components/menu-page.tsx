@@ -225,7 +225,7 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                   <span className="text-gray-600">Total</span>
                   <span className="font-bold text-gray-900">&#8377;{totalPrice}</span>
                 </div>
-                <Button className="w-full h-12 text-base font-semibold rounded-xl">
+                <Button className="w-full h-12 text-base font-semibold rounded-xl" onClick={() => window.location.href='/checkout'}>
                   Proceed to Checkout
                 </Button>
                 <button

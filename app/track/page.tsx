@@ -16,7 +16,7 @@ interface Order {
   address: string;
   items: string;
   price: number;
-  status: "Pending" | "Preparing" | "Delivered";
+  status: "Pending" | "Preparing" | "Delivered" | "Cancelled";
   created_at: string;
 }
 
@@ -42,6 +42,14 @@ export default function TrackPage() {
     setLoading(false);
   };
 
+  const handleCancel = async (orderId: string) => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+    await supabase.from("orders").update({ status: "Cancelled" }).eq("id", orderId);
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: "Cancelled" } : o))
+    );
+  };
+
   const getStatusStep = (status: string) => {
     if (status === "Pending") return 1;
     if (status === "Preparing") return 2;
@@ -53,6 +61,7 @@ export default function TrackPage() {
     if (status === "Pending") return "text-yellow-500";
     if (status === "Preparing") return "text-blue-500";
     if (status === "Delivered") return "text-green-500";
+    if (status === "Cancelled") return "text-red-500";
     return "text-yellow-500";
   };
 
@@ -106,34 +115,43 @@ export default function TrackPage() {
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="flex justify-between mb-2">
-              {["Pending", "Preparing", "Delivered"].map((step, index) => (
-                <div key={step} className="flex flex-col items-center flex-1">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${
-                    getStatusStep(order.status) >= index + 1
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-700 text-gray-400"
-                  }`}>
-                    {index + 1}
+          {order.status !== "Cancelled" && (
+            <div className="mb-4">
+              <div className="flex justify-between mb-2">
+                {["Pending", "Preparing", "Delivered"].map((step, index) => (
+                  <div key={step} className="flex flex-col items-center flex-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${
+                      getStatusStep(order.status) >= index + 1
+                        ? "bg-orange-500 text-white"
+                        : "bg-gray-700 text-gray-400"
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <span className={`text-xs text-center ${
+                      getStatusStep(order.status) >= index + 1
+                        ? "text-orange-500"
+                        : "text-gray-500"
+                    }`}>
+                      {step}
+                    </span>
                   </div>
-                  <span className={`text-xs text-center ${
-                    getStatusStep(order.status) >= index + 1
-                      ? "text-orange-500"
-                      : "text-gray-500"
-                  }`}>
-                    {step}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
+              <div className="relative h-2 bg-gray-700 rounded-full">
+                <div
+                  className="absolute h-2 bg-orange-500 rounded-full transition-all duration-500"
+                  style={{ width: `${((getStatusStep(order.status) - 1) / 2) * 100}%` }}
+                />
+              </div>
             </div>
-            <div className="relative h-2 bg-gray-700 rounded-full">
-              <div
-                className="absolute h-2 bg-orange-500 rounded-full transition-all duration-500"
-                style={{ width: `${((getStatusStep(order.status) - 1) / 2) * 100}%` }}
-              />
+          )}
+
+          {/* Cancelled Banner */}
+          {order.status === "Cancelled" && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4 text-center">
+              <p className="text-red-500 font-medium">This order has been cancelled</p>
             </div>
-          </div>
+          )}
 
           {/* Order Details */}
           {order.items && (
@@ -141,6 +159,16 @@ export default function TrackPage() {
           )}
           {order.price > 0 && (
             <p className="text-orange-500 font-bold">₹{order.price}</p>
+          )}
+
+          {/* Cancel Button - only for Pending orders */}
+          {order.status === "Pending" && (
+            <button
+              onClick={() => handleCancel(order.id)}
+              className="mt-4 w-full py-2 bg-red-500/10 text-red-500 border border-red-500/30 rounded-lg font-medium hover:bg-red-500/20 transition-colors"
+            >
+              Cancel Order
+            </button>
           )}
         </div>
       ))}

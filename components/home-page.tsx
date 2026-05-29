@@ -53,15 +53,26 @@ export default function HomePage() {
             Hot Food. Bold Flavor.
           </p>
 
-          <Link href="/menu">
-            <Button 
-              size="lg" 
-              className="text-lg px-10 py-7 font-bold group shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all"
-            >
-              Order Now
-              <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/menu">
+              <Button 
+                size="lg" 
+                className="text-lg px-10 py-7 font-bold group shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all"
+              >
+                Order Now
+                <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="/checkout">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-10 py-7 font-bold border-primary text-primary hover:bg-primary hover:text-white transition-all"
+              >
+                📦 Track Order
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Bottom fade */}

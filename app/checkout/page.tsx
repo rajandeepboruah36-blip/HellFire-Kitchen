@@ -15,7 +15,16 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const savedOrderId = localStorage.getItem("lastOrderId");
-    if (savedOrderId) setOrderId(savedOrderId);
+    const savedTime = localStorage.getItem("lastOrderTime");
+    if (savedOrderId && savedTime) {
+      const hoursPassed = (Date.now() - parseInt(savedTime)) / (1000 * 60 * 60);
+      if (hoursPassed < 3) {
+        setOrderId(savedOrderId);
+      } else {
+        localStorage.removeItem("lastOrderId");
+        localStorage.removeItem("lastOrderTime");
+      }
+    }
   }, []);
 
   const handleSubmit = async () => {
@@ -45,6 +54,7 @@ export default function CheckoutPage() {
 
     const newOrderId = data[0].id;
     localStorage.setItem("lastOrderId", newOrderId);
+    localStorage.setItem("lastOrderTime", Date.now().toString());
     setOrderId(newOrderId);
 
     const whatsappMessage = `New Order from Hell Fire Kitchen!
@@ -59,6 +69,7 @@ Address: ${form.address}`;
   if (orderId) {
     return <OrderStatus orderId={orderId} onNewOrder={() => {
       localStorage.removeItem("lastOrderId");
+      localStorage.removeItem("lastOrderTime");
       setOrderId(null);
     }} />;
   }
@@ -140,7 +151,6 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
         <p className="text-gray-400 mb-6">Hi {customerName}! 👋</p>
       )}
 
-      {/* Status Card */}
       <div className="bg-gray-900 rounded-xl p-6 mb-6 border border-gray-700">
         <p className="text-gray-400 text-sm mb-1">Current Status</p>
         <p className={`text-2xl font-bold ${
@@ -154,7 +164,6 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
         </p>
       </div>
 
-      {/* Progress */}
       <div className="bg-gray-900 rounded-xl p-6 mb-6 border border-gray-700">
         <div className="flex justify-between mb-4">
           {steps.map((step, index) => (
@@ -188,14 +197,12 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
         Updates automatically every 10 seconds
       </p>
 
-      {status === "Delivered" && (
-        <button
-          onClick={onNewOrder}
-          className="w-full p-4 bg-orange-500 rounded-lg font-bold text-lg mb-4"
-        >
-          Place New Order 🔥
-        </button>
-      )}
+      <button
+        onClick={onNewOrder}
+        className="w-full p-4 bg-orange-500 rounded-lg font-bold text-lg mb-4"
+      >
+        {status === "Delivered" ? "Place New Order 🔥" : "Order More Items 🛒"}
+      </button>
 
       <a href="/" className="block text-center text-gray-400 hover:text-white">
         ← Back to Home

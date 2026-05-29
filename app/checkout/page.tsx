@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -9,10 +8,10 @@ const supabase = createClient(
 );
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     if (!form.name || !form.phone || !form.address) {
@@ -20,15 +19,24 @@ export default function CheckoutPage() {
       return;
     }
     setLoading(true);
+    setError("");
 
-    await supabase.from("orders").insert([
+    const { error: dbError } = await supabase.from("orders").insert([
       {
         customer_name: form.name,
         phone: form.phone,
         address: form.address,
+        items: "Order from app",
+        price: 0,
         status: "Pending",
       },
     ]);
+
+    if (dbError) {
+      setError("Failed to save order: " + dbError.message);
+      setLoading(false);
+      return;
+    }
 
     const whatsappMessage = `New Order from Hell Fire Kitchen!
 Name: ${form.name}
@@ -45,11 +53,16 @@ Address: ${form.address}`;
       <h1 className="text-2xl font-bold text-orange-500 mb-6">Checkout</h1>
       {success ? (
         <div className="text-center">
-          <h2 className="text-xl text-green-500">Order Placed!</h2>
+          <h2 className="text-xl text-green-500">Order Placed! ✅</h2>
           <p className="text-gray-400 mt-2">We will contact you shortly!</p>
         </div>
       ) : (
         <div className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-900 text-red-300 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <input
             className="w-full p-3 bg-gray-800 rounded-lg"
             placeholder="Your Name"
@@ -80,5 +93,4 @@ Address: ${form.address}`;
     </div>
   );
 }
-
-      
+  

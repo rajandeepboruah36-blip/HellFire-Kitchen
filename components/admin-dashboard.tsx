@@ -44,6 +44,10 @@ export function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [restaurantName, setRestaurantName] = useState("HellFire Kitchen");
+  const [restaurantPhone, setRestaurantPhone] = useState("");
+  const [restaurantAddress, setRestaurantAddress] = useState("");
+  const [saved, setSaved] = useState(false);
 
   const fetchOrders = async () => {
     const { data } = await supabase
@@ -76,6 +80,58 @@ export function AdminDashboard() {
     { icon: ShoppingBag, label: "Orders" },
     { icon: Settings, label: "Settings" },
   ];
+
+  const handleSaveSettings = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const OrdersList = ({ title }: { title: string }) => (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <h2 className="text-lg font-bold text-foreground">{title}</h2>
+        <button onClick={fetchOrders} className="text-sm text-orange-500 hover:underline">
+          Refresh
+        </button>
+      </div>
+      {orders.length === 0 ? (
+        <div className="p-8 text-center text-muted-foreground">
+          No orders yet. Orders will appear here when customers place them.
+        </div>
+      ) : (
+        <div className="divide-y divide-border">
+          {orders.map((order) => (
+            <div key={order.id} className="p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-medium text-foreground">{order.customer_name}</p>
+                  <p className="text-xs text-muted-foreground">{order.phone}</p>
+                  <p className="text-xs text-muted-foreground">{order.address}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{order.items}</p>
+                </div>
+                <StatusBadge status={order.status} />
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-orange-500 font-bold">₹{order.price}</p>
+                <select
+                  value={order.status}
+                  onChange={(e) => updateOrderStatus(order.id, e.target.value as Order["status"])}
+                  className="bg-background border border-border rounded-md px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Preparing">Preparing</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {new Date(order.created_at).toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -132,72 +188,83 @@ export function AdminDashboard() {
         </header>
 
         <main className="p-4 lg:p-6">
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-1">Pending</p>
-              <p className="text-2xl font-bold text-yellow-500">{stats.pending}</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-1">Preparing</p>
-              <p className="text-2xl font-bold text-blue-500">{stats.preparing}</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-1">Delivered</p>
-              <p className="text-2xl font-bold text-green-500">{stats.delivered}</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold text-primary">₹{stats.total}</p>
-            </div>
-          </div>
 
-          {/* Orders */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="p-4 border-b border-border flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">
-                {activeTab === "Orders" ? "All Orders" : "Recent Orders"}
-              </h2>
-              <button onClick={fetchOrders} className="text-sm text-orange-500 hover:underline">
-                Refresh
+          {/* DASHBOARD TAB */}
+          {activeTab === "Dashboard" && (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-500">{stats.pending}</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Preparing</p>
+                  <p className="text-2xl font-bold text-blue-500">{stats.preparing}</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Delivered</p>
+                  <p className="text-2xl font-bold text-green-500">{stats.delivered}</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Total Revenue</p>
+                  <p className="text-2xl font-bold text-primary">₹{stats.total}</p>
+                </div>
+              </div>
+              <OrdersList title="Recent Orders" />
+            </>
+          )}
+
+          {/* ORDERS TAB */}
+          {activeTab === "Orders" && (
+            <OrdersList title="All Orders" />
+          )}
+
+          {/* SETTINGS TAB */}
+          {activeTab === "Settings" && (
+            <div className="bg-card border border-border rounded-lg p-6 space-y-6">
+              <h2 className="text-lg font-bold text-foreground">Restaurant Settings</h2>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Restaurant Name</label>
+                <input
+                  type="text"
+                  value={restaurantName}
+                  onChange={(e) => setRestaurantName(e.target.value)}
+                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Phone Number</label>
+                <input
+                  type="text"
+                  value={restaurantPhone}
+                  onChange={(e) => setRestaurantPhone(e.target.value)}
+                  placeholder="Enter phone number"
+                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Address</label>
+                <input
+                  type="text"
+                  value={restaurantAddress}
+                  onChange={(e) => setRestaurantAddress(e.target.value)}
+                  placeholder="Enter restaurant address"
+                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <button
+                onClick={handleSaveSettings}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                {saved ? "✅ Saved!" : "Save Settings"}
               </button>
             </div>
+          )}
 
-            {orders.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                No orders yet. Orders will appear here when customers place them.
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {orders.map((order) => (
-                  <div key={order.id} className="p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-medium text-foreground">{order.customer_name}</p>
-                        <p className="text-xs text-muted-foreground">{order.phone}</p>
-                        <p className="text-xs text-muted-foreground">{order.address}</p>
-                      </div>
-                      <StatusBadge status={order.status} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(order.created_at).toLocaleString()}
-                      </p>
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order.id, e.target.value as Order["status"])}
-                        className="bg-background border border-border rounded-md px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Preparing">Preparing</option>
-                        <option value="Delivered">Delivered</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </main>
       </div>
 

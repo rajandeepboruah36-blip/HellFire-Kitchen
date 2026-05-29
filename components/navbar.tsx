@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
@@ -54,6 +54,13 @@ export function Navbar() {
               className="text-muted-foreground hover:text-primary transition-colors font-medium"
             >
               Login
+            </Link>
+            <Link
+              href="/admin"
+              className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1"
+            >
+              <Settings className="h-4 w-4" />
+              Admin
             </Link>
             <Link href="/menu">
               <Button variant="outline" className="relative border-primary/30 hover:border-primary">
@@ -117,6 +124,14 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Login
+              </Link>
+              <Link
+                href="/admin"
+                className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium flex items-center gap-1"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Settings className="h-4 w-4" />
+                Admin
               </Link>
             </div>
           </div>

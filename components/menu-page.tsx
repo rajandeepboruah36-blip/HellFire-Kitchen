@@ -209,7 +209,8 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 
 export function MenuPage() {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const { totalItems, totalPrice, cartOpen, setCartOpen } = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
+  const { totalItems, totalPrice } = useCart();
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const scrollToCategory = (category: string) => {
@@ -226,7 +227,6 @@ export function MenuPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Restaurant Header */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
@@ -256,7 +256,6 @@ export function MenuPage() {
         </div>
       </div>
 
-      {/* Category Tabs */}
       <div className="sticky top-16 z-20 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide">
@@ -277,7 +276,6 @@ export function MenuPage() {
         </div>
       </div>
 
-      {/* Menu Grid */}
       <div className="max-w-6xl mx-auto px-4 py-6">
         <section ref={(el) => { sectionRefs.current[activeCategory] = el; }}>
           <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -294,7 +292,6 @@ export function MenuPage() {
         </section>
       </div>
 
-      {/* Floating Cart Bar */}
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="max-w-6xl mx-auto">
@@ -319,7 +316,6 @@ export function MenuPage() {
         </div>
       )}
 
-      {/* Cart Sidebar */}
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </main>
   );

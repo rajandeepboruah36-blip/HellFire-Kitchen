@@ -12,19 +12,30 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const savedOrderId = localStorage.getItem("lastOrderId");
-    const savedTime = localStorage.getItem("lastOrderTime");
-    if (savedOrderId && savedTime) {
-      const hoursPassed = (Date.now() - parseInt(savedTime)) / (1000 * 60 * 60);
-      if (hoursPassed < 3) {
-        setOrderId(savedOrderId);
-      } else {
-        localStorage.removeItem("lastOrderId");
-        localStorage.removeItem("lastOrderTime");
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = "/auth";
+        return;
       }
-    }
+      setChecking(false);
+
+      const savedOrderId = localStorage.getItem("lastOrderId");
+      const savedTime = localStorage.getItem("lastOrderTime");
+      if (savedOrderId && savedTime) {
+        const hoursPassed = (Date.now() - parseInt(savedTime)) / (1000 * 60 * 60);
+        if (hoursPassed < 3) {
+          setOrderId(savedOrderId);
+        } else {
+          localStorage.removeItem("lastOrderId");
+          localStorage.removeItem("lastOrderTime");
+        }
+      }
+    };
+    checkAuth();
   }, []);
 
   const handleSubmit = async () => {
@@ -65,6 +76,14 @@ Address: ${form.address}`;
     setLoading(false);
     window.open(whatsappURL, "_blank");
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="text-orange-500 text-lg">Loading...</p>
+      </div>
+    );
+  }
 
   if (orderId) {
     return <OrderStatus orderId={orderId} onNewOrder={() => {

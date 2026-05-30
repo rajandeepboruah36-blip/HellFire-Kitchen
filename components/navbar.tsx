@@ -8,7 +8,7 @@ import { ShoppingCart, Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
-  const { totalItems, setCartOpen } = useCart();
+  const { totalItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -50,35 +50,30 @@ export function Navbar() {
               <Settings className="h-4 w-4" />
               Admin
             </Link>
-            <Button
-              variant="outline"
-              className="relative border-primary/30 hover:border-primary"
-              onClick={() => setCartOpen(true)}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
+            <Link href="/menu">
+              <Button variant="outline" className="relative border-primary/30 hover:border-primary">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="relative border-primary/30"
-              onClick={() => setCartOpen(true)}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
+            <Link href="/menu">
+              <Button variant="outline" size="sm" className="relative border-primary/30">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="sm"
@@ -97,32 +92,16 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/50">
             <div className="flex flex-col gap-4">
-              <Link
-                href="/"
-                className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link href="/" className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Home
               </Link>
-              <Link
-                href="/menu"
-                className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link href="/menu" className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Menu
               </Link>
-              <Link
-                href="/auth"
-                className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link href="/auth" className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Login
               </Link>
-              <Link
-                href="/admin"
-                className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium flex items-center gap-1"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <Link href="/admin" className="text-muted-foreground hover:text-primary transition-colors px-2 py-2 font-medium flex items-center gap-1" onClick={() => setMobileMenuOpen(false)}>
                 <Settings className="h-4 w-4" />
                 Admin
               </Link>

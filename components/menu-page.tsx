@@ -33,7 +33,6 @@ function MenuItemCard({ item }: { item: MenuItem }) {
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
-      {/* Image Container */}
       <div className="relative h-44 overflow-hidden">
         <Image
           src={item.image}
@@ -59,7 +58,6 @@ function MenuItemCard({ item }: { item: MenuItem }) {
         )}
       </div>
 
-      {/* Content */}
       <div className="p-4">
         <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1">
           {item.name}
@@ -68,7 +66,6 @@ function MenuItemCard({ item }: { item: MenuItem }) {
           {item.description}
         </p>
 
-        {/* Size Selection */}
         {item.sizes.length > 1 && (
           <div className="flex gap-2 mb-3">
             {item.sizes.map((size, idx) => (
@@ -87,7 +84,6 @@ function MenuItemCard({ item }: { item: MenuItem }) {
           </div>
         )}
 
-        {/* Price and Add Button */}
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900">
             &#8377;{item.sizes[selectedSize].price}
@@ -132,10 +128,7 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 z-40"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
       )}
 
       <aside
@@ -146,10 +139,7 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         <div className="flex flex-col h-full">
           <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <h2 className="text-xl font-bold text-gray-900">Your Cart</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-            >
+            <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
               <X className="h-5 w-5 text-gray-600" />
             </button>
           </div>
@@ -168,50 +158,27 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             <>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {items.map((item) => (
-                  <div
-                    key={`${item.id}-${item.size}`}
-                    className="bg-gray-50 rounded-xl p-4 flex gap-3"
-                  >
+                  <div key={`${item.id}-${item.size}`} className="bg-gray-50 rounded-xl p-4 flex gap-3">
                     {item.image && (
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={item.image} alt={item.name} fill className="object-cover" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 text-sm truncate">
-                        {item.name}
-                      </h4>
+                      <h4 className="font-medium text-gray-900 text-sm truncate">{item.name}</h4>
                       <p className="text-gray-500 text-xs">{item.size}</p>
-                      <p className="text-primary font-bold text-sm mt-1">
-                        &#8377;{item.price * item.quantity}
-                      </p>
+                      <p className="text-primary font-bold text-sm mt-1">&#8377;{item.price * item.quantity}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <button
-                        onClick={() => removeFromCart(`${item.id}-${item.size}`)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
+                      <button onClick={() => removeFromCart(`${item.id}-${item.size}`)} className="text-gray-400 hover:text-red-500 transition-colors">
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg">
-                        <button
-                          className="p-1.5 hover:bg-gray-50 transition-colors rounded-l-lg"
-                          onClick={() => updateQuantity(`${item.id}-${item.size}`, item.quantity - 1)}
-                        >
+                        <button className="p-1.5 hover:bg-gray-50 transition-colors rounded-l-lg" onClick={() => updateQuantity(`${item.id}-${item.size}`, item.quantity - 1)}>
                           <Minus className="h-3 w-3 text-primary" />
                         </button>
-                        <span className="w-6 text-center text-sm font-medium text-gray-900">
-                          {item.quantity}
-                        </span>
-                        <button
-                          className="p-1.5 hover:bg-gray-50 transition-colors rounded-r-lg"
-                          onClick={() => updateQuantity(`${item.id}-${item.size}`, item.quantity + 1)}
-                        >
+                        <span className="w-6 text-center text-sm font-medium text-gray-900">{item.quantity}</span>
+                        <button className="p-1.5 hover:bg-gray-50 transition-colors rounded-r-lg" onClick={() => updateQuantity(`${item.id}-${item.size}`, item.quantity + 1)}>
                           <Plus className="h-3 w-3 text-primary" />
                         </button>
                       </div>
@@ -228,10 +195,7 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                 <Button className="w-full h-12 text-base font-semibold rounded-xl" onClick={() => window.location.href='/checkout'}>
                   Proceed to Checkout
                 </Button>
-                <button
-                  onClick={clearCart}
-                  className="w-full text-center text-gray-500 text-sm hover:text-red-500 transition-colors"
-                >
+                <button onClick={clearCart} className="w-full text-center text-gray-500 text-sm hover:text-red-500 transition-colors">
                   Clear Cart
                 </button>
               </div>
@@ -245,8 +209,7 @@ function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 
 export function MenuPage() {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const { totalItems, totalPrice } = useCart();
+  const { totalItems, totalPrice, cartOpen, setCartOpen } = useCart();
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const scrollToCategory = (category: string) => {
@@ -268,12 +231,7 @@ export function MenuPage() {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-100 shrink-0">
-              <Image
-                src="/images/logo.png"
-                alt="Hell Fire Kitchen"
-                fill
-                className="object-cover"
-              />
+              <Image src="/images/logo.png" alt="Hell Fire Kitchen" fill className="object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold text-gray-900">Hell Fire Kitchen</h1>

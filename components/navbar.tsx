@@ -8,7 +8,7 @@ import { ShoppingCart, Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
-  const { totalItems } = useCart();
+  const { totalItems, setCartOpen } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -37,55 +37,48 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/"
-              className="text-muted-foreground hover:text-primary transition-colors font-medium"
-            >
+            <Link href="/" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Home
             </Link>
-            <Link
-              href="/menu"
-              className="text-muted-foreground hover:text-primary transition-colors font-medium"
-            >
+            <Link href="/menu" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Menu
             </Link>
-            <Link
-              href="/auth"
-              className="text-muted-foreground hover:text-primary transition-colors font-medium"
-            >
+            <Link href="/auth" className="text-muted-foreground hover:text-primary transition-colors font-medium">
               Login
             </Link>
-            <Link
-              href="/admin"
-              className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1"
-            >
+            <Link href="/admin" className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1">
               <Settings className="h-4 w-4" />
               Admin
             </Link>
-            <Link href="/menu">
-              <Button variant="outline" className="relative border-primary/30 hover:border-primary">
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                    {totalItems}
-                  </span>
-                )}
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="relative border-primary/30 hover:border-primary"
+              onClick={() => setCartOpen(true)}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-3">
-            <Link href="/menu">
-              <Button variant="outline" size="sm" className="relative border-primary/30">
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                    {totalItems}
-                  </span>
-                )}
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              className="relative border-primary/30"
+              onClick={() => setCartOpen(true)}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
             <Button
               variant="ghost"
               size="sm"

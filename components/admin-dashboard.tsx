@@ -205,7 +205,7 @@ export function AdminDashboard() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                {new Date(order.created_at).toLocaleString()}
+                {new Date(order.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
               </p>
             </div>
           ))}
@@ -342,7 +342,9 @@ export function AdminDashboard() {
                         </button>
                       </div>
                       <p className="text-sm text-muted-foreground">{review.comment}</p>
-                      <p className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(review.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                      </p>
                     </div>
                   ))}
                 </div>

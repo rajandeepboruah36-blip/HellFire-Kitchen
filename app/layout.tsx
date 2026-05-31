@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Hell Fire Kitchen - Taste the Fire, Feel the Flavor',
   description: 'Order delicious food from Hell Fire Kitchen. Serving Namrup and surrounding areas.',
   generator: 'v0.app',
+  manifest: '/manifest.json',
   icons: {
     icon: [
       {
@@ -37,6 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ff6b00" />
+      </head>
       <body className="font-sans antialiased">
         <ClientLayout>{children}</ClientLayout>
         {process.env.NODE_ENV === 'production' && <Analytics />}

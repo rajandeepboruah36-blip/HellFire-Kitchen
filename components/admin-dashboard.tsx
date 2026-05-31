@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import {
-  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle, Truck, Trash2,
+  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle, Truck, Trash2, Star,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -21,6 +21,14 @@ interface Order {
   items: string;
   price: number;
   status: "Pending" | "Preparing" | "Out for Delivery" | "Delivered" | "Cancelled";
+  created_at: string;
+}
+
+interface Review {
+  id: string;
+  customer_name: string;
+  rating: number;
+  comment: string;
   created_at: string;
 }
 
@@ -45,6 +53,7 @@ function StatusBadge({ status }: { status: Order["status"] }) {
 export function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [restaurantName, setRestaurantName] = useState("HellFire Kitchen");
   const [restaurantPhone, setRestaurantPhone] = useState("");
@@ -59,8 +68,17 @@ export function AdminDashboard() {
     if (data) setOrders(data);
   };
 
+  const fetchReviews = async () => {
+    const { data } = await supabase
+      .from("reviews")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setReviews(data);
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchReviews();
     const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -91,6 +109,20 @@ export function AdminDashboard() {
     }
   };
 
+  const deleteReview = async (reviewId: string) => {
+    if (confirm("Are you sure you want to delete this review?")) {
+      await supabase.from("reviews").delete().eq("id", reviewId);
+      fetchReviews();
+    }
+  };
+
+  const deleteAllReviews = async () => {
+    if (confirm("Are you sure you want to delete ALL reviews? This cannot be undone!")) {
+      await supabase.from("reviews").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      fetchReviews();
+    }
+  };
+
   const stats = {
     pending: orders.filter((o) => o.status === "Pending").length,
     preparing: orders.filter((o) => o.status === "Preparing").length,
@@ -103,6 +135,7 @@ export function AdminDashboard() {
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard" },
     { icon: ShoppingBag, label: "Orders" },
+    { icon: Star, label: "Reviews" },
     { icon: Settings, label: "Settings" },
   ];
 
@@ -119,10 +152,7 @@ export function AdminDashboard() {
           <button onClick={fetchOrders} className="text-sm text-orange-500 hover:underline">
             Refresh
           </button>
-          <button
-            onClick={deleteAllOrders}
-            className="text-sm text-red-500 hover:underline flex items-center gap-1"
-          >
+          <button onClick={deleteAllOrders} className="text-sm text-red-500 hover:underline flex items-center gap-1">
             <Trash2 className="h-3 w-3" />
             Delete All
           </button>
@@ -145,10 +175,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <StatusBadge status={order.status} />
-                  <button
-                    onClick={() => deleteOrder(order.id)}
-                    className="text-red-500 hover:text-red-400 transition-colors"
-                  >
+                  <button onClick={() => deleteOrder(order.id)} className="text-red-500 hover:text-red-400 transition-colors">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -279,10 +306,53 @@ export function AdminDashboard() {
             <OrdersList title="All Orders" />
           )}
 
+          {activeTab === "Reviews" && (
+            <div className="bg-card border border-border rounded-lg overflow-hidden">
+              <div className="p-4 border-b border-border flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Customer Reviews</h2>
+                <div className="flex items-center gap-2">
+                  <button onClick={fetchReviews} className="text-sm text-orange-500 hover:underline">
+                    Refresh
+                  </button>
+                  <button onClick={deleteAllReviews} className="text-sm text-red-500 hover:underline flex items-center gap-1">
+                    <Trash2 className="h-3 w-3" />
+                    Delete All
+                  </button>
+                </div>
+              </div>
+              {reviews.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">
+                  No reviews yet.
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-medium text-foreground">{review.customer_name}</p>
+                          <div className="flex gap-0.5 mt-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star key={star} className={`h-4 w-4 ${star <= review.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-400"}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <button onClick={() => deleteReview(review.id)} className="text-red-500 hover:text-red-400 transition-colors">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{review.comment}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === "Settings" && (
             <div className="bg-card border border-border rounded-lg p-6 space-y-6">
               <h2 className="text-lg font-bold text-foreground">Restaurant Settings</h2>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Restaurant Name</label>
                 <input
@@ -292,7 +362,6 @@ export function AdminDashboard() {
                   className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Phone Number</label>
                 <input
@@ -303,7 +372,6 @@ export function AdminDashboard() {
                   className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Address</label>
                 <input
@@ -314,7 +382,6 @@ export function AdminDashboard() {
                   className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-
               <button
                 onClick={handleSaveSettings}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md transition-colors"

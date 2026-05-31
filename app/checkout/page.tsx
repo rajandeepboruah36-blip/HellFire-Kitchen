@@ -157,11 +157,12 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
   const getStatusStep = () => {
     if (status === "Pending") return 1;
     if (status === "Preparing") return 2;
-    if (status === "Delivered") return 3;
+    if (status === "Out for Delivery") return 3;
+    if (status === "Delivered") return 4;
     return 1;
   };
 
-  const steps = ["Pending", "Preparing", "Delivered"];
+  const steps = ["Pending", "Preparing", "On Way", "Delivered"];
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -175,10 +176,12 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
         <p className={`text-2xl font-bold ${
           status === "Pending" ? "text-yellow-500" :
           status === "Preparing" ? "text-blue-500" :
+          status === "Out for Delivery" ? "text-orange-500" :
           "text-green-500"
         }`}>
           {status === "Pending" && "⏳ Order Received"}
           {status === "Preparing" && "👨‍🍳 Being Prepared"}
+          {status === "Out for Delivery" && "🛵 Out for Delivery"}
           {status === "Delivered" && "✅ Delivered!"}
         </p>
       </div>
@@ -207,7 +210,7 @@ function OrderStatus({ orderId, onNewOrder }: { orderId: string; onNewOrder: () 
         <div className="relative h-2 bg-gray-700 rounded-full">
           <div
             className="absolute h-2 bg-orange-500 rounded-full transition-all duration-500"
-            style={{ width: `${((getStatusStep() - 1) / 2) * 100}%` }}
+            style={{ width: `${((getStatusStep() - 1) / 3) * 100}%` }}
           />
         </div>
       </div>

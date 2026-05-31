@@ -1,10 +1,10 @@
-"use client";
+You"use client";
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import {
-  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle, Truck,
+  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle, Truck, Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -77,6 +77,20 @@ export function AdminDashboard() {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    if (confirm("Are you sure you want to delete this order?")) {
+      await supabase.from("orders").delete().eq("id", orderId);
+      fetchOrders();
+    }
+  };
+
+  const deleteAllOrders = async () => {
+    if (confirm("Are you sure you want to delete ALL orders? This cannot be undone!")) {
+      await supabase.from("orders").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      fetchOrders();
+    }
+  };
+
   const stats = {
     pending: orders.filter((o) => o.status === "Pending").length,
     preparing: orders.filter((o) => o.status === "Preparing").length,
@@ -101,9 +115,18 @@ export function AdminDashboard() {
     <div className="bg-card border border-border rounded-lg overflow-hidden">
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="text-lg font-bold text-foreground">{title}</h2>
-        <button onClick={fetchOrders} className="text-sm text-orange-500 hover:underline">
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={fetchOrders} className="text-sm text-orange-500 hover:underline">
+            Refresh
+          </button>
+          <button
+            onClick={deleteAllOrders}
+            className="text-sm text-red-500 hover:underline flex items-center gap-1"
+          >
+            <Trash2 className="h-3 w-3" />
+            Delete All
+          </button>
+        </div>
       </div>
       {orders.length === 0 ? (
         <div className="p-8 text-center text-muted-foreground">
@@ -120,7 +143,15 @@ export function AdminDashboard() {
                   <p className="text-xs text-muted-foreground">{order.address}</p>
                   <p className="text-sm text-muted-foreground mt-1">{order.items}</p>
                 </div>
-                <StatusBadge status={order.status} />
+                <div className="flex flex-col items-end gap-2">
+                  <StatusBadge status={order.status} />
+                  <button
+                    onClick={() => deleteOrder(order.id)}
+                    className="text-red-500 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-orange-500 font-bold">₹{order.price}</p>

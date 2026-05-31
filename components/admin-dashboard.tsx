@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import {
-  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle,
+  Flame, LayoutDashboard, ShoppingBag, Settings, LogOut, Menu, X, Clock, ChefHat, CheckCircle, XCircle, Truck,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ interface Order {
   address: string;
   items: string;
   price: number;
-  status: "Pending" | "Preparing" | "Delivered" | "Cancelled";
+  status: "Pending" | "Preparing" | "Out for Delivery" | "Delivered" | "Cancelled";
   created_at: string;
 }
 
@@ -28,6 +28,7 @@ function StatusBadge({ status }: { status: Order["status"] }) {
   const statusConfig = {
     Pending: { bg: "bg-yellow-500/10", text: "text-yellow-500", icon: Clock },
     Preparing: { bg: "bg-blue-500/10", text: "text-blue-500", icon: ChefHat },
+    "Out for Delivery": { bg: "bg-orange-500/10", text: "text-orange-500", icon: Truck },
     Delivered: { bg: "bg-green-500/10", text: "text-green-500", icon: CheckCircle },
     Cancelled: { bg: "bg-red-500/10", text: "text-red-500", icon: XCircle },
   };
@@ -79,6 +80,7 @@ export function AdminDashboard() {
   const stats = {
     pending: orders.filter((o) => o.status === "Pending").length,
     preparing: orders.filter((o) => o.status === "Preparing").length,
+    outForDelivery: orders.filter((o) => o.status === "Out for Delivery").length,
     delivered: orders.filter((o) => o.status === "Delivered").length,
     cancelled: orders.filter((o) => o.status === "Cancelled").length,
     total: orders.reduce((acc, o) => acc + (o.price || 0), 0),
@@ -130,6 +132,7 @@ export function AdminDashboard() {
                   >
                     <option value="Pending">Pending</option>
                     <option value="Preparing">Preparing</option>
+                    <option value="Out for Delivery">Out for Delivery</option>
                     <option value="Delivered">Delivered</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>
@@ -209,10 +212,9 @@ export function AdminDashboard() {
 
         <main className="p-4 lg:p-6">
 
-          {/* DASHBOARD TAB */}
           {activeTab === "Dashboard" && (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Pending</p>
                   <p className="text-2xl font-bold text-yellow-500">{stats.pending}</p>
@@ -220,6 +222,10 @@ export function AdminDashboard() {
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Preparing</p>
                   <p className="text-2xl font-bold text-blue-500">{stats.preparing}</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Out for Delivery</p>
+                  <p className="text-2xl font-bold text-orange-500">{stats.outForDelivery}</p>
                 </div>
                 <div className="bg-card border border-border rounded-lg p-4">
                   <p className="text-sm text-muted-foreground mb-1">Delivered</p>
@@ -238,12 +244,10 @@ export function AdminDashboard() {
             </>
           )}
 
-          {/* ORDERS TAB */}
           {activeTab === "Orders" && (
             <OrdersList title="All Orders" />
           )}
 
-          {/* SETTINGS TAB */}
           {activeTab === "Settings" && (
             <div className="bg-card border border-border rounded-lg p-6 space-y-6">
               <h2 className="text-lg font-bold text-foreground">Restaurant Settings</h2>

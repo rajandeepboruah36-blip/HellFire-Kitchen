@@ -16,7 +16,7 @@ interface Order {
   address: string;
   items: string;
   price: number;
-  status: "Pending" | "Preparing" | "Delivered" | "Cancelled";
+  status: "Pending" | "Preparing" | "Out for Delivery" | "Delivered" | "Cancelled";
   created_at: string;
 }
 
@@ -53,13 +53,15 @@ export default function TrackPage() {
   const getStatusStep = (status: string) => {
     if (status === "Pending") return 1;
     if (status === "Preparing") return 2;
-    if (status === "Delivered") return 3;
+    if (status === "Out for Delivery") return 3;
+    if (status === "Delivered") return 4;
     return 1;
   };
 
   const getStatusColor = (status: string) => {
     if (status === "Pending") return "text-yellow-500";
     if (status === "Preparing") return "text-blue-500";
+    if (status === "Out for Delivery") return "text-orange-500";
     if (status === "Delivered") return "text-green-500";
     if (status === "Cancelled") return "text-red-500";
     return "text-yellow-500";
@@ -67,13 +69,11 @@ export default function TrackPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
-      {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <Flame className="h-8 w-8 text-orange-500" />
         <h1 className="text-2xl font-bold text-orange-500">Track Your Order</h1>
       </div>
 
-      {/* Search */}
       <div className="space-y-4 mb-8">
         <input
           className="w-full p-3 bg-gray-800 rounded-lg text-white placeholder-gray-400"
@@ -91,7 +91,6 @@ export default function TrackPage() {
         </button>
       </div>
 
-      {/* Results */}
       {searched && orders.length === 0 && (
         <div className="text-center text-gray-400 mt-8">
           <p className="text-lg">No orders found for this phone number.</p>
@@ -101,7 +100,6 @@ export default function TrackPage() {
 
       {orders.map((order) => (
         <div key={order.id} className="bg-gray-900 rounded-xl p-5 mb-4 border border-gray-700">
-          {/* Order Info */}
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="font-bold text-lg">{order.customer_name}</p>
@@ -114,11 +112,10 @@ export default function TrackPage() {
             </span>
           </div>
 
-          {/* Progress Bar */}
           {order.status !== "Cancelled" && (
             <div className="mb-4">
               <div className="flex justify-between mb-2">
-                {["Pending", "Preparing", "Delivered"].map((step, index) => (
+                {["Pending", "Preparing", "Out for Delivery", "Delivered"].map((step, index) => (
                   <div key={step} className="flex flex-col items-center flex-1">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${
                       getStatusStep(order.status) >= index + 1
@@ -132,7 +129,7 @@ export default function TrackPage() {
                         ? "text-orange-500"
                         : "text-gray-500"
                     }`}>
-                      {step}
+                      {step === "Out for Delivery" ? "On Way" : step}
                     </span>
                   </div>
                 ))}
@@ -140,20 +137,18 @@ export default function TrackPage() {
               <div className="relative h-2 bg-gray-700 rounded-full">
                 <div
                   className="absolute h-2 bg-orange-500 rounded-full transition-all duration-500"
-                  style={{ width: `${((getStatusStep(order.status) - 1) / 2) * 100}%` }}
+                  style={{ width: `${((getStatusStep(order.status) - 1) / 3) * 100}%` }}
                 />
               </div>
             </div>
           )}
 
-          {/* Cancelled Banner */}
           {order.status === "Cancelled" && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4 text-center">
               <p className="text-red-500 font-medium">This order has been cancelled</p>
             </div>
           )}
 
-          {/* Order Details */}
           {order.items && (
             <p className="text-gray-300 text-sm mb-2">🍽️ {order.items}</p>
           )}
@@ -161,7 +156,6 @@ export default function TrackPage() {
             <p className="text-orange-500 font-bold">₹{order.price}</p>
           )}
 
-          {/* Cancel Button - only for Pending orders */}
           {order.status === "Pending" && (
             <button
               onClick={() => handleCancel(order.id)}
@@ -173,7 +167,6 @@ export default function TrackPage() {
         </div>
       ))}
 
-      {/* Back to Home */}
       <div className="mt-8 text-center">
         <Link href="/" className="text-orange-500 hover:underline">
           ← Back to Home

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useCart } from "@/lib/cart-context";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,6 +14,7 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
+  const { items, totalPrice, clearCart } = useCart();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -46,13 +48,17 @@ export default function CheckoutPage() {
     setLoading(true);
     setError("");
 
+    const itemsSummary = items
+      .map((item) => `${item.name} (${item.size}) x${item.quantity}`)
+      .join(", ");
+
     const { data, error: dbError } = await supabase.from("orders").insert([
       {
         customer_name: form.name,
         phone: form.phone,
         address: form.address,
-        items: "Order from app",
-        price: 0,
+        items: itemsSummary || "Order from app",
+        price: totalPrice,
         status: "Pending",
       },
     ]).select();
@@ -67,11 +73,14 @@ export default function CheckoutPage() {
     localStorage.setItem("lastOrderId", newOrderId);
     localStorage.setItem("lastOrderTime", Date.now().toString());
     setOrderId(newOrderId);
+    clearCart();
 
     const whatsappMessage = `New Order from Hell Fire Kitchen!
 Name: ${form.name}
 Phone: ${form.phone}
-Address: ${form.address}`;
+Address: ${form.address}
+Items: ${itemsSummary}
+Total: ₹${totalPrice}`;
     const whatsappURL = `https://wa.me/919957798040?text=${encodeURIComponent(whatsappMessage)}`;
     setLoading(false);
     window.open(whatsappURL, "_blank");
@@ -96,6 +105,24 @@ Address: ${form.address}`;
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h1 className="text-2xl font-bold text-orange-500 mb-6">Checkout</h1>
+
+      {/* Order Summary */}
+      {items.length > 0 && (
+        <div className="bg-gray-900 rounded-xl p-4 mb-6 border border-gray-700">
+          <h2 className="font-bold text-lg mb-3">Order Summary</h2>
+          {items.map((item) => (
+            <div key={`${item.id}-${item.size}`} className="flex justify-between text-sm mb-2">
+              <span className="text-gray-300">{item.name} ({item.size}) x{item.quantity}</span>
+              <span className="text-orange-500">₹{item.price * item.quantity}</span>
+            </div>
+          ))}
+          <div className="border-t border-gray-700 mt-3 pt-3 flex justify-between font-bold">
+            <span>Total</span>
+            <span className="text-orange-500">₹{totalPrice}</span>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         {error && (
           <div className="p-3 bg-red-900 text-red-300 rounded-lg text-sm">
@@ -125,7 +152,7 @@ Address: ${form.address}`;
           disabled={loading}
           className="w-full p-4 bg-orange-500 rounded-lg font-bold text-lg"
         >
-          {loading ? "Placing Order..." : "Place Order"}
+          {loading ? "Placing Order..." : `Place Order ₹${totalPrice}`}
         </button>
       </div>
     </div>

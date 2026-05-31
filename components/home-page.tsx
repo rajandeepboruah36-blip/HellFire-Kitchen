@@ -108,6 +108,21 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-card to-transparent" />
       </section>
 
+      {/* QR Code Section */}
+      <section className="py-12 bg-black flex flex-col items-center">
+        <h2 className="text-orange-500 text-2xl font-bold mb-2">📱 Scan to Order!</h2>
+        <p className="text-gray-400 text-sm mb-6">Point your camera to visit our menu</p>
+        <div className="p-3 bg-white rounded-xl border-4 border-orange-500 shadow-lg shadow-orange-500/30">
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://hell-fire-kitchen.vercel.app&bgcolor=ffffff&color=cc4400&qzone=2"
+            alt="Scan to order"
+            width={200}
+            height={200}
+          />
+        </div>
+        <p className="text-gray-500 text-xs mt-4">hell-fire-kitchen.vercel.app</p>
+      </section>
+
       {/* Info Section */}
       <section className="py-24 bg-card">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -168,7 +183,6 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Review Form */}
           {showForm && (
             <div className="max-w-md mx-auto bg-card border border-border rounded-2xl p-6 mb-12">
               <h3 className="font-bold text-lg text-foreground mb-4">Your Review</h3>
@@ -208,7 +222,6 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Reviews List */}
           {reviews.length === 0 ? (
             <p className="text-center text-muted-foreground">No reviews yet. Be the first to review!</p>
           ) : (
